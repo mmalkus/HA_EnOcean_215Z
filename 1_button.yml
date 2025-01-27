@@ -52,9 +52,9 @@ variables:
 triggers:
   - trigger: state
     entity_id: !input 'switch'
-      attribute: event_type
-      to:
-        - '{{ ''press_'' + button }}'
+    attribute: event_type
+    to:
+      - '{{ ''press_'' + button }}'
 
 actions:
   - action: light.turn_on
