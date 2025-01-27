@@ -17,7 +17,7 @@ blueprint:
       selector:
         entity:
           filter: 
-            - integration: mqtt
+            - integration: MQTT
           multiple: true 
     dim_speed:
       name: Dimming Speed
