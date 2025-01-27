@@ -18,7 +18,6 @@ blueprint:
         entity:
           filter: 
             - integration: mqtt
-              domain: event
           multiple: true 
     dim_speed:
       name: Dimming Speed
