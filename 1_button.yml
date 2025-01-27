@@ -52,6 +52,7 @@ max_exceeded: silent
 
 variables:
   hold_delay: !input "hold_delay"
+  button: !input "button"
 trigger_variables:
   base_topic: !input "base_topic"
   controller: !input "controller"
@@ -62,7 +63,7 @@ condition:
   - condition: template
     value_template: >
       {{
-        trigger.payload_json.action == "press_1"
+        trigger.payload_json.action == "press_" + button
       }}
 actions:
   - action: light.turn_on
