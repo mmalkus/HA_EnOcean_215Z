@@ -11,13 +11,12 @@ blueprint:
       name: (Zigbee2MQTT) Base mqtt topic
       description: The base topic as configured in z2m
       default: zigbee2mqtt
-    switch:
+    target:
       name: HA device name, action entity
       description: The entity from HA
       selector:
         entity:
-          filter: 
-            - integration: MQTT
+          domain: light
           multiple: true 
     dim_speed:
       name: Dimming Speed
@@ -67,5 +66,5 @@ condition:
       }}
 actions:
   - action: light.turn_on
-    target: !input switch
+    target: !input target
     
