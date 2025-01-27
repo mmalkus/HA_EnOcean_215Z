@@ -34,27 +34,37 @@ blueprint:
         number:
           min: 1
           max: 4
+          mode: box
+    hold_delay:
+      name: Hold delay
+      description:
+        If the button has been held more than the configured Hold delay, the corresponding held action is triggered.
+      default: 500
+      selector:
+        number:
+          min: 100.0
+          max: 1000.0
+          unit_of_measurement: milliseconds
+          mode: box
+          step: 10.0
 
 mode: single
 max_exceeded: silent
 
 variables:
-  base_topic: !input base_topic
-  controller: !input controller
-  button: !input button
-  dimspeed: !input dim_speed
-  keypress: '{{ trigger.to_state.attributes.event_type }}'
-  timediff: >-
-    {{ (trigger.to_state.last_changed -
-    trigger.from_state.last_changed).total_seconds() }}
-  
-triggers:
-  - trigger: state
-    entity_id: !input switch
-    attribute: event_type
-    to:
-      - '{{ ''press_'' + button }}'
-
+  hold_delay: !input "hold_delay"
+trigger_variables:
+  base_topic: !input "base_topic"
+  controller: !input "controller"
+trigger:
+  - platform: mqtt
+    topic: "{{ base_topic ~ '/' ~ controller }}"
+condition:
+  - condition: template
+    value_template: >
+      {{
+        trigger.payload_json.action == "press_1"
+      }}
 actions:
   - action: light.turn_on
     target: !input switch
