@@ -43,7 +43,7 @@ variables:
   base_topic: !input base_topic
   controller: !input controller
   button: !input button
-  dimspeed: !input 'dim_speed'
+  dimspeed: !input dim_speed
   keypress: '{{ trigger.to_state.attributes.event_type }}'
   timediff: >-
     {{ (trigger.to_state.last_changed -
@@ -51,14 +51,12 @@ variables:
   
 triggers:
   - trigger: state
-    entity_id: !input 'switch'
+    entity_id: !input switch
     attribute: event_type
     to:
       - '{{ ''press_'' + button }}'
 
 actions:
   - action: light.turn_on
-    target:
-      entity_id:
-        - light.voorkamer_sta
+    target: !input switch
     
