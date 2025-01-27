@@ -1,0 +1,64 @@
+blueprint:
+  name: Z2M - EnOcean PTM215Z (Friends of Hue) switch, single button, multiple clicks
+  description: ''
+  domain: automation
+  input:
+    controller:
+      name: (Zigbee2MQTT) Controller Name
+      description: The name of the controller as defined in z2m (e.g. Livingroom Switch)
+      default: ""
+    base_topic:
+      name: (Zigbee2MQTT) Base mqtt topic
+      description: The base topic as configured in z2m
+      default: zigbee2mqtt
+    switch:
+      name: HA device name, action entity
+      description: The entity from HA
+      selector:
+        entity:
+          filter: 
+            - integration: mqtt
+              domain: event
+          multiple: true 
+    dim_speed:
+      name: Dimming Speed
+      description: The speed of the dimming effect. 
+      default: 50
+      selector:
+        number:
+          min: 1
+          max: 500
+          step: 1
+    button:
+      name: Button to configure
+      selector:
+        number:
+          min: 1
+          max: 4
+
+mode: single
+max_exceeded: silent
+
+variables:
+  base_topic: !input base_topic
+  controller: !input controller
+  button: !input button
+  dimspeed: !input 'dim_speed'
+  keypress: '{{ trigger.to_state.attributes.event_type }}'
+  timediff: >-
+    {{ (trigger.to_state.last_changed -
+    trigger.from_state.last_changed).total_seconds() }}
+  
+triggers:
+  - trigger: state
+    entity_id: !input 'switch'
+      attribute: event_type
+      to:
+        - '{{ ''press_'' + button }}'
+
+actions:
+  - action: light.turn_on
+      target:
+        entity_id:
+          - light.voorkamer_sta
+    
