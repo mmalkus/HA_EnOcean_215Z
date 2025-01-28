@@ -53,9 +53,10 @@ max_exceeded: silent
 variables:
   hold_delay: !input "hold_delay"
   button: !input "button"
-trigger_variables:
+  nr_clicks: 0
   base_topic: !input "base_topic"
   controller: !input "controller"
+
 trigger:
   - platform: mqtt
     topic: "{{ base_topic ~ '/' ~ controller }}"
@@ -66,20 +67,25 @@ condition:
         trigger.payload_json.action == "press_" ~ button
       }}
 actions:
-  - wait_for_trigger:
-      - platform: mqtt
-        topic: "{{ base_topic ~ '/' ~ controller ~ '/action' }}"
-        payload: "{{ 'release_' ~ button }}"
-    timeout:
-       milliseconds: !input "hold_delay"
-  - if:
-      - "{{ wait.completed }}"
-    then: 
-      - action: light.turn_off
-        target: 
-          entity_id: !input target
-    else:
-      - action: light.turn_on
-        target:
-          entity_id: !input target
+  - repeat:
+      until: "{{ wait.completed or nr_clicks == 4}}"
+      sequence: 
+        - wait_for_trigger:
+            - platform: mqtt
+              topic: "{{ base_topic ~ '/' ~ controller ~ '/action' }}"
+              payload: "{{ 'release_' ~ button }}"
+          timeout:
+            milliseconds: !input "hold_delay"
+        - wait_for_trigger:
+            - platform: mqtt
+              topic: "{{ base_topic ~ '/' ~ controller ~ '/action' }}"
+              payload: "{{ 'press_' ~ button }}"
+          timeout:
+            milliseconds: !input "hold_delay"
+        - variables:
+            nr_clicks: "{{ nr_clicks + 1 }}"
+  - action: mqtt.publish
+    data:
+      topic: '{{ base_topic ~ ''/'' ~ controller ~ ''/set''}}'
+      payload: "{\"test\": {{ nr_clicks }} }"
   
