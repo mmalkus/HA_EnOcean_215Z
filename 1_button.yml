@@ -73,13 +73,13 @@ actions:
     timeout:
        milliseconds: !input "hold_delay"
   - if:
-    - "{{ wait.completed }}"
+      - "{{ wait.completed }}"
     then: 
-    - action: light.turn_off
-      target: 
-        entity_id: !input target
+      - action: light.turn_off
+        target: 
+          entity_id: !input target
     else:
-    - action: light.turn_on
-      target:
-        entity_id: !input target
+      - action: light.turn_on
+        target:
+          entity_id: !input target
   
