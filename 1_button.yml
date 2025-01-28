@@ -87,4 +87,4 @@ actions:
   - action: mqtt.publish
     data:
       topic: '{{ base_topic ~ ''/'' ~ controller ~ ''/set''}}'
-      payload: "{{'"test": "' ~ nr_clicks ~ '"' }}"
+      payload: "{\"test\": \"{{ nr_clicks }}\" }"
