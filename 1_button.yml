@@ -88,5 +88,5 @@ actions:
             nr_clicks: "{{ nr_clicks + 1 }}"
   - action: mqtt.publish
     data:
-      topic: '{{ base_topic ~ ''/'' ~ controller ~ ''/set''}}'
-      payload: "{\"test\": \"{{ nr_clicks }}\" }"
+      topic: '{{ base_topic ~ ''/'' ~ controller ~ ''/test''}}'
+      payload: {{ nr_clicks }}
