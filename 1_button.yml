@@ -66,7 +66,20 @@ condition:
         trigger.payload_json.action == "press_" ~ button
       }}
 actions:
-  - action: light.turn_on
-    target: 
-      entity_id: !input target
+  - wait_for_trigger:
+      - platform: mqtt
+        topic: "{{ base_topic ~ '/' ~ controller ~ '/action' }}"
+        payload: "{{ 'release_' ~ button }}"
+    timeout:
+       milliseconds: !input "hold_delay"
+  - if:
+    - "{{ wait.completed }}"
+  - then: 
+    - action: light.turn_off
+      target: 
+        entity_id: !input target
+  - else:
+    - action: light.turn_on
+      target:
+        entity: !input target
   
