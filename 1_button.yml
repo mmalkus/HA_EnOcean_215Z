@@ -86,6 +86,11 @@ actions:
             milliseconds: !input "hold_delay"
         - variables:
             nr_clicks: "{{ nr_clicks + 1 }}"
+        - action: mqtt.publish
+          data:
+            topic: '{{ base_topic ~ ''/'' ~ controller ~ ''/test1''}}'
+            payload: {{ nr_clicks }}
+         
   - action: mqtt.publish
     data:
       topic: '{{ base_topic ~ ''/'' ~ controller ~ ''/test''}}'
