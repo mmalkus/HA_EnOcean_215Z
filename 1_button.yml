@@ -81,5 +81,5 @@ actions:
   - else:
     - action: light.turn_on
       target:
-        entity: !input target
+        entity_id: !input target
   
