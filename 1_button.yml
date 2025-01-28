@@ -46,7 +46,8 @@ blueprint:
           unit_of_measurement: milliseconds
           mode: box
           step: 10.0
-
+  source_url: https://raw.githubusercontent.com/mmalkus/HA_EnOcean_215Z/refs/heads/main/1_button.yml
+  
 mode: single
 max_exceeded: silent
 
