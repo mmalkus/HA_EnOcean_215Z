@@ -55,9 +55,10 @@ variables:
   hold_delay: !input "hold_delay"
   button: !input "button"
   nr_clicks: 0
+
+trigger_variables:
   base_topic: !input "base_topic"
   controller: !input "controller"
-
 trigger:
   - platform: mqtt
     topic: "{{ base_topic ~ '/' ~ controller }}"
