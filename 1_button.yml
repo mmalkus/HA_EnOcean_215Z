@@ -69,7 +69,7 @@ condition:
       }}
 actions:
   - repeat:
-      until: "{{ wait.completed or repeat.index > 4}}"
+      until: "{{ wait.completed or repeat.index >= 4}}"
       sequence: 
         - wait_for_trigger:
             - platform: mqtt
