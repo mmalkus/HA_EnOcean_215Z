@@ -69,7 +69,10 @@ condition:
       }}
 actions:
   - repeat:
-      until: "{{ wait.completed or repeat.index >= 4}}"
+        # Allow for multiple presses to register
+      until: "{{ wait.completed or repeat.index >= 4 or dim_completed}}"
+      variables: 
+        dim_completed: false
       sequence: 
         - wait_for_trigger:
             - platform: mqtt
@@ -77,13 +80,37 @@ actions:
               payload: "{{ 'release_' ~ button }}"
           timeout:
             milliseconds: !input "hold_delay"
-        - wait_for_trigger:
-            - platform: mqtt
-              topic: "{{ base_topic ~ '/' ~ controller ~ '/action' }}"
-              payload: "{{ 'press_' ~ button }}"
-          timeout:
-            milliseconds: !input "hold_delay"
-        - action: mqtt.publish
-          data:
-            topic: '{{ base_topic ~ ''/'' ~ controller ~ ''/test1''}}'
-            payload: "{{ 'nr_clicks:' ~ repeat.index }}"
+        - if:
+            # Button is held, 
+            - "{{ wait.completed }}"
+          then: 
+            # Start dimming
+            - action: mqtt.publish
+              data:
+                topic: '{{ base_topic ~ ''/'' ~ controller ~ ''/set''}}'
+                payload: "{\"brightness_move_onoff\": {{ dimspeed_n }} }"
+            - wait_for_trigger:
+                - platform: mqtt
+                  topic: "{{ base_topic ~ '/' ~ controller ~ '/action' }}"
+                  payload: "{{ 'release_' ~ button }}"
+              timeout: 3
+              # Stop dimming when release or after 3 seconds
+            - action: mqtt.publish
+              data:
+                topic: '{{ base_topic ~ ''/'' ~ controller ~ ''/set''}}'
+                payload: "{\"brightness_move\": \"stop\"}"
+            - variables: 
+                dim_completed: true
+
+          else:
+            # Button is released, check for an additional press
+            - wait_for_trigger:
+                - platform: mqtt
+                  topic: "{{ base_topic ~ '/' ~ controller ~ '/action' }}"
+                  payload: "{{ 'press_' ~ button }}"
+              timeout:
+                milliseconds: !input "hold_delay"
+            - action: mqtt.publish
+              data:
+                topic: '{{ base_topic ~ ''/'' ~ controller ~ ''/test1''}}'
+                payload: "{{ 'nr_clicks:' ~ repeat.index }}"
